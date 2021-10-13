@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<style>
+			body {
+				background-color: black;
+				margin: 0;
+				overflow: hidden;
+			}
+			canvas {
+				margin-left: calc(50% - 270px);
+				background-image: url('images/bg.jpg');
+				background-position: center;
+				background-size: cover;
+			}
+		</style>
+	</head>
+	<body onload="startGame()">
+		<script>
+
+			var ship, shots = [], enemies = [], enemySpeed, shot;
+
+			function startGame() {
+				shot = 0;
+				enemySpeed = 2.5;
+				game.start();
+				ship = new component(30, 30, "#80FF80", (game.canvas.width / 2) - 15, (game.canvas.height - 60), "ship");
+				shipX = new component("15px", "Monospace", "white", 15, 30, "text");
+				enemies.push(new component(30, 30, "red", 120, 60, "enemy"));
+			}
+
+			var game = {
+				canvas : document.createElement("canvas"),
+				start : function() {
+					this.canvas.width = 540;
+					this.canvas.height = window.innerHeight;
+					this.context = this.canvas.getContext("2d");
+					document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+					this.interval = setInterval(updateGame, (1000 / 60));
+					window.addEventListener('keydown', function (e) {
+						game.keys = (game.keys || []);
+						game.keys[e.keyCode] = (e.type == "keydown");
+					})
+					window.addEventListener('keyup', function (e) {
+						game.keys[e.keyCode] = (e.type == "keydown");            
+					})
+					window.addEventListener('mousedown', function () {shoot();})
+				}, 
+				clear : function(){
+					this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				}
+			}
+
+			function component(width, height, color, x, y, type) {
+				this.type = type;
+				this.gamearea = game;
+				this.width = width;
+				this.height = height;
+				this.speedX = 0;
+				this.speedY = 0;    
+				this.x = x;
+				this.y = y;    
+				this.update = function() {
+					ctx = game.context;
+					if (this.type == "ship") {
+						ctx.strokeStyle = color;
+						ctx.fillStyle = "rgba(0, 64, 0, 0.75)";
+						ctx.beginPath();
+						ctx.moveTo(this.x,this.y + 30);
+						ctx.lineTo(this.x + 10,this.y);
+						ctx.lineTo(this.x + 20,this.y);
+						ctx.lineTo(this.x + 30,this.y + 30);
+						ctx.lineTo(this.x + 20,this.y + 20);
+						ctx.lineTo(this.x + 10,this.y + 20);
+						ctx.lineTo(this.x,this.y + 30);
+						ctx.closePath();
+						ctx.stroke();
+						ctx.fill();
+						ctx.beginPath();
+						ctx.arc(this.x+15,this.y+10,3,0,2 * Math.PI);
+						ctx.closePath();
+						ctx.stroke();
+						ctx.fill();
+					} else if (this.type == "enemy") {
+						ctx.strokeStyle = color;
+						ctx.fillStyle = "rgba(64, 0, 0, 0.75)";
+						ctx.beginPath();
+						ctx.moveTo(this.x, this.y);
+						ctx.lineTo(this.x + 30, this.y);
+						ctx.lineTo(this.x + 15, this.y+30);
+						ctx.lineTo(this.x, this.y);
+						ctx.closePath();
+						ctx.stroke();
+						ctx.fill();
+					} else if (this.type == "text") {
+						ctx.font = this.width + " " + this.height;
+						ctx.fillStyle = color;
+						ctx.fillText(this.text, this.x, this.y);
+					} else if (type == "border") {
+						ctx.strokeStyle = color;
+						ctx.strokeRect(this.x, this.y, this.width, this.height);
+					} else {
+						ctx.fillStyle = color;
+						ctx.fillRect(this.x, this.y, this.width, this.height);
+					}
+				}
+				this.newPos = function() {
+					this.x += this.speedX;
+					this.y += this.speedY;        
+				}    
+			}
+
+			function updateGame() {
+				game.clear();
+				game.context.fillStyle = "rgba(0, 0, 0, 0.5)";
+				game.context.fillRect(0, 0, game.canvas.width, game.canvas.height);
+				ship.speedX = 0;
+				ship.speedY = 0;    
+				if (game.keys && game.keys[37]) {ship.speedX = -5; }
+				if (game.keys && game.keys[39]) {ship.speedX = 5; }
+				if (game.keys && game.keys[32]) {shoot(); }
+				if (game.keys && !game.keys[32]) {shot = 0;}
+				ship.newPos();
+				if (ship.x < 120) {
+					ship.x = 120;
+				} if (ship.x > game.canvas.width - 120) {
+					ship.x = game.canvas.width - 120;
+				}
+				
+				for (var i = 0; i < enemies.length; i++) {
+					enemies[i].x += enemySpeed;
+					if (enemies[i].x < 120) {
+						enemies.x = 120;
+						enemySpeed *= -1;
+					} if (enemies[i].x > game.canvas.width - 120) {
+						enemies[i].x = game.canvas.width - 120;
+						enemySpeed *= -1;
+					}
+					enemies[i].update();
+				}
+				for (var i = 0; i < shots.length; i++) {
+					shots[i].y -= 10;
+					shots[i].update();
+					if (shots[i].x >= enemies[0].x && shots[i].x <= (enemies[0].x + 25)) {
+						if (shots[i].y <= enemies[0].y && shots[i].y >= (enemies[0].y + 30)) {
+							enemies.splice(0, 1);
+						}
+					}
+					 if (shots[i].y <= -10) {
+						shots.splice(i, 1);
+					}
+				}
+				
+				if (shots.length > 50) {
+					shots.splice(50, 1);
+				}
+				ship.update();
+				shipX.text = "ship.x: " + (ship.x - (game.canvas.width / 2) + 150);
+				shipX.update();
+			}
+			
+			function shoot() {
+				if (shot == 0) {
+					shots.push(new component(5, 10, "#80FF80", ship.x+12.5, ship.y+10, "border"));
+				}
+				shot += 1;
+			}
+		</script>
+	</body>
+</html>
