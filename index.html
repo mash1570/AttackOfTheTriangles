@@ -143,7 +143,7 @@
 					shots[i].y -= 10;
 					shots[i].update();
 					if (shots[i].x >= enemies[0].x && shots[i].x <= (enemies[0].x + 25)) {
-						if (shots[i].y <= enemies[0].y && shots[i].y >= (enemies[0].y + 30)) {
+						if (shots[i].y >= enemies[0].y && shots[i].y <= (enemies[0].y + 30)) {
 							enemies.splice(0, 1);
 						}
 					}
@@ -164,7 +164,7 @@
 				if (shot == 0) {
 					shots.push(new component(5, 10, "#80FF80", ship.x+12.5, ship.y+10, "border"));
 				}
-				shot += 0;
+				shot += 1;
 			}
 		</script>
 	</body>
