@@ -19,14 +19,16 @@
 	<body onload="startGame()">
 		<script>
 
-			var ship, shots = [], enemies = [], enemySpeed, shot;
+			var ship, score, shots = [], enemies = [], enemySpeed, shot;
 
 			function startGame() {
+				score = 0;
 				shot = 0;
 				enemySpeed = 2.5;
 				game.start();
 				ship = new component(30, 30, "#80FF80", (game.canvas.width / 2) - 15, (game.canvas.height - 60), "ship");
 				shipX = new component("15px", "Monospace", "white", 15, 30, "text");
+				scoreText = new component("15px", "Monospace", "white", 15, 60, "text");
 				enemies.push(new component(30, 30, "red", 120, 60, "enemy"));
 			}
 
@@ -146,6 +148,8 @@
 						if (shots[i].x >= enemies[0].x && shots[i].x <= (enemies[0].x + 25)) {
 							if (shots[i].y >= enemies[0].y && shots[i].y <= (enemies[0].y + 30)) {
 								enemies.splice(0, 1);
+								score += 1;
+								enemies.push(new component(30, 30, "red", 120, 60, "enemy"));
 							}
 						}
 					}
@@ -160,6 +164,8 @@
 				ship.update();
 				shipX.text = "ship.x: " + (ship.x - (game.canvas.width / 2) + 150);
 				shipX.update();
+				scoreText.text = "Score: " + score;
+				scoreText.update();
 			}
 			
 			function shoot() {
