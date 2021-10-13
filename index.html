@@ -4,15 +4,18 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<style>
 			body {
-				background-color: black;
+				background-image: url('images/bg.jpg');
+				background-position: center;
+				background-size: cover;
 				margin: 0;
 				overflow: hidden;
 			}
 			canvas {
 				margin-left: calc(50% - 270px);
 				background-image: url('images/bg.jpg');
-				background-position: center;
-				background-size: cover;
+				background-position: top;
+				background-size: auto calc(100% + 5px);
+				padding: 0;
 			}
 		</style>
 	</head>
@@ -115,8 +118,6 @@
 
 			function updateGame() {
 				game.clear();
-				game.context.fillStyle = "rgba(0, 0, 0, 0.5)";
-				game.context.fillRect(0, 0, game.canvas.width, game.canvas.height);
 				ship.speedX = 0;
 				ship.speedY = 0;    
 				if (game.keys && game.keys[37]) {ship.speedX = -5; }
