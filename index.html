@@ -6,7 +6,8 @@
 			body {
 				background-image: url('images/bg.jpg');
 				background-position: center;
-				background-size: cover;
+				background-repeat: no-repeat;
+				background-color: black;
 				margin: 0;
 				overflow: hidden;
 			}
@@ -15,6 +16,7 @@
 				background-image: url('images/bg.jpg');
 				background-position: top;
 				background-size: auto calc(100% + 5px);
+				background-repeat: no-repeat;
 				padding: 0;
 			}
 		</style>
@@ -117,6 +119,11 @@
 			}
 
 			function updateGame() {
+				if (window.innerWidth >= (window.innerHeight * (16 / 9))) {
+					document.body.style.backgroundSize = "auto 100%";
+				} else {
+					document.body.style.backgroundSize = "cover";
+				}
 				game.clear();
 				ship.speedX = 0;
 				ship.speedY = 0;    
