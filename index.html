@@ -10,6 +10,8 @@
 				background-color: black;
 				margin: 0;
 				overflow: hidden;
+				color: white;
+				font-family: monospace;
 			}
 			canvas {
 				margin-left: calc(50% - 270px);
@@ -33,6 +35,10 @@
 				shot = 0;
 				enemySpeed = 2.5/6;
 				game.start();
+				if ((game.canvas.width > game.canvas.height*(16/9)) || (window.innerWidth < game.canvas.width)) {
+					game.canvas.remove();
+					document.body.innerHTML = "Your screen is too small to play this game. Please increase window size to play."
+				}
 				ship = new component(30, 30, "white", (game.canvas.width / 2) - 15, (game.canvas.height - 60), "ship");
 				shipX = new component("15px", "Monospace", "white", 15, 30, "text");
 				scoreText = new component("15px", "Monospace", "white", 15, 60, "text");
